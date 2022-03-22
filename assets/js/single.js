@@ -1,18 +1,19 @@
 // get elements on page for later
 var issueContainerEl = document.querySelector("#issues-container");
 var limitWarningEl = document.querySelector("#limit-warning");
+var repoNameEl = document.querySelector("#repo-name");
 
 // queries the github api for the info that we want
-var getRepoIssues = function(repo) {
+var getRepoIssues = function (repo) {
     var apiUrl = "https://api.github.com/repos/" + repo + "/issues?direction=asc";
-    
-    fetch(apiUrl).then(function(response) {
+
+    fetch(apiUrl).then(function (response) {
 
         // checks of the response came back okay
         if (response.ok) {
-            
+
             // converts to JSON
-            response.json().then(function(data) {
+            response.json().then(function (data) {
 
                 // sends the response to the display functio
                 displayIssues(data);
@@ -23,15 +24,15 @@ var getRepoIssues = function(repo) {
                 };
             });
         } else {
-            
+
             // lets the user know if there is an issue
-            alert("There was a problem with your request!");
+            document.location.replace("./index.html")
         }
     })
 }
 
 
-var displayIssues = function(issues) {
+var displayIssues = function (issues) {
     if (issues.length === 0) {
         issueContainerEl.textContent = "This repo has no open issues!";
         return;
@@ -62,7 +63,7 @@ var displayIssues = function(issues) {
     }
 };
 
-var displayWarning = function(repo) {
+var displayWarning = function (repo) {
 
     var linkEl = document.createElement("a");
     linkEl.textContent = "See More Issues on GitHub.com";
@@ -72,4 +73,20 @@ var displayWarning = function(repo) {
     limitWarningEl.appendChild(linkEl);
 }
 
-getRepoIssues("facebook/react");
+// get the repo id
+var getRepoName = function () {
+
+    // grabs the repo id from the url
+    var queryString = document.location.search;
+    var repoName = queryString.split("=")[1];
+
+    // checks if a value was sent, if not back to homepage
+    if (repoName) {
+        getRepoIssues(repoName);
+        repoNameEl.textContent = repoName;
+    } else {
+        document.location.replace("./index.html")
+    }
+}
+
+getRepoName();
